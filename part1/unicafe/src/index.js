@@ -17,6 +17,14 @@ const Statistiikka = (props) => {
         <li>{props.tila.tilastot[0].nimi} {props.tila.tilastot[0].value}</li>
         <li>{props.tila.tilastot[1].nimi} {props.tila.tilastot[1].value}</li>
         <li>{props.tila.tilastot[2].nimi} {props.tila.tilastot[2].value}</li>
+        <li>
+        {props.tila.tilastot[3].nimi} {
+          Number.parseFloat(props.tila.tilastot[3].value).toFixed(1)}
+        </li>
+        <li>
+        {props.tila.tilastot[4].nimi} {
+          Number.parseFloat(props.tila.tilastot[4].value).toFixed(1)}%
+        </li>
       </ul>
     </div>
   )
@@ -58,6 +66,14 @@ class App extends React.Component {
           nimi: "huono",
           value: 0,
           funktio: this.kasvataHuono
+        },
+        {
+          nimi: "keskiarvo",
+          value: 0,
+        },
+        {
+          nimi: "positiivisia",
+          value: 0,
         }
       ]
     }
@@ -67,6 +83,8 @@ class App extends React.Component {
     return () => {
       const elementit = this.state.tilastot
       elementit[0].value = elementit[0].value + 1
+      elementit[3].value = this.laskeKeskiarvo()
+      elementit[4].value = this.positiiviOsuus()
 
       this.setState({
         tilastot: elementit
@@ -78,6 +96,8 @@ class App extends React.Component {
     return () => {
       const elementit = this.state.tilastot
       elementit[1].value = elementit[1].value + 1
+      elementit[3].value = this.laskeKeskiarvo()
+      elementit[4].value = this.positiiviOsuus()
 
       this.setState({
         tilastot: elementit
@@ -89,11 +109,31 @@ class App extends React.Component {
     return () => {
       const elementit = this.state.tilastot
       elementit[2].value = elementit[2].value + 1
+      elementit[3].value = this.laskeKeskiarvo()
+      elementit[4].value = this.positiiviOsuus()
 
       this.setState({
         tilastot: elementit
       })
     }
+  }
+
+  laskeKeskiarvo = function() {
+    const elementit = this.state.tilastot
+    const keskiarvo = elementit[3].value = Math.abs(elementit[0].value -
+      elementit[2].value) /
+      (elementit[0].value +
+        elementit[1].value + elementit[2].value)
+
+    return keskiarvo
+  }
+
+  positiiviOsuus = function () {
+    const elementit = this.state.tilastot
+    const osuus = elementit[0].value / (elementit[0].value +
+                  elementit[1].value + elementit[2].value) * 100
+
+    return osuus
   }
 
   render() {
