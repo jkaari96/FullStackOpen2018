@@ -7,42 +7,58 @@ const Otsikko = (props) => {
   )
 }
 
-const Statistiikka = (props) => {
-
-
+const Button = (props) => {
   return (
-    <div>
-      <Otsikko name="statistiikka"/>
-      <ul>
-        <li>{props.tila.tilastot[0].nimi} {props.tila.tilastot[0].value}</li>
-        <li>{props.tila.tilastot[1].nimi} {props.tila.tilastot[1].value}</li>
-        <li>{props.tila.tilastot[2].nimi} {props.tila.tilastot[2].value}</li>
-        <li>
-        {props.tila.tilastot[3].nimi} {
-          Number.parseFloat(props.tila.tilastot[3].value).toFixed(1)}
-        </li>
-        <li>
-        {props.tila.tilastot[4].nimi} {
-          Number.parseFloat(props.tila.tilastot[4].value).toFixed(1)}%
-        </li>
-      </ul>
-    </div>
+    <button onClick={props.funktio}>{props.name}</button>
   )
+}
+
+const Statistic = (props) => {
+  return (
+    <li>{props.name} {props.value}</li>
+  )
+}
+
+const Statistics = (props) => {
+  if (props.tila[0].value === 0 && props.tila[1].value === 0 &&
+      props.tila[2].value === 0){
+        return (
+          <div>
+            <Otsikko name="statistiikka"/>
+            <p>ei yhtään palautetta annettu</p>
+          </div>
+        )
+  } else {
+    return (
+      <div>
+        <Otsikko name="statistiikka"/>
+        <ul>
+          <Statistic name={props.tila[0].nimi}
+            value={props.tila[0].value} />
+          <Statistic name={props.tila[1].nimi}
+            value={props.tila[1].value} />
+          <Statistic name={props.tila[2].nimi}
+            value={props.tila[2].value} />
+          <Statistic name={props.tila[3].nimi}
+            value={props.tila[3].value.toFixed(1)} />
+          <Statistic name={props.tila[4].nimi}
+            value={props.tila[4].value.toFixed(1) + "%"} />
+        </ul>
+      </div>
+    )
+  }
 }
 
 const Palaute = (props) => {
   return (
     <div>
       <Otsikko name="anna palautetta"/>
-      <button onClick={props.tila.tilastot[0].funktio()}>
-        {props.tila.tilastot[0].nimi}
-      </button>
-      <button onClick={props.tila.tilastot[1].funktio()}>
-        {props.tila.tilastot[1].nimi}
-      </button>
-      <button onClick={props.tila.tilastot[2].funktio()}>
-        {props.tila.tilastot[2].nimi}
-      </button>
+      <Button funktio={props.tila[0].funktio()}
+              name={props.tila[0].nimi} />
+      <Button funktio={props.tila[1].funktio()}
+              name={props.tila[1].nimi} />
+      <Button funktio={props.tila[2].funktio()}
+              name={props.tila[2].nimi} />
     </div>
   )
 }
@@ -130,17 +146,16 @@ class App extends React.Component {
 
   positiiviOsuus = function () {
     const elementit = this.state.tilastot
-    const osuus = elementit[0].value / (elementit[0].value +
-                  elementit[1].value + elementit[2].value) * 100
-
+    const osuus = (elementit[0].value / (elementit[0].value +
+                  elementit[1].value + elementit[2].value) * 100)
     return osuus
   }
 
   render() {
     return (
       <div>
-        <Palaute tila={this.state} />
-        <Statistiikka tila={this.state} />
+        <Palaute tila={this.state.tilastot} />
+        <Statistics tila={this.state.tilastot} />
       </div>
     )
   }
