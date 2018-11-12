@@ -34,16 +34,19 @@ const Statistics = (props) => {
     return (
       <div>
         <table>
-          <Statistic name="hyvä"
-            value={props.tila.hyva} />
-          <Statistic name="neutraali"
-            value={props.tila.neutraali} />
-          <Statistic name="huono"
-            value={props.tila.huono} />
-          <Statistic name="keskiarvo"
-            value={props.funktiot.laskeKeskiarvo().toFixed(1)} />
-          <Statistic name="positiivisia"
-            value={props.funktiot.laskePositiivistenOsuus().toFixed(1) + "%"} />
+          <tbody>
+            <Statistic name="hyvä"
+              value={props.tila.hyva} />
+            <Statistic name="neutraali"
+              value={props.tila.neutraali} />
+            <Statistic name="huono"
+              value={props.tila.huono} />
+            <Statistic name="keskiarvo"
+              value={props.funktiot.laskeKeskiarvo().toFixed(1)} />
+            <Statistic name="positiivisia"
+              value={props.funktiot.laskePositiivistenOsuus().toFixed(1) + "%"}
+              />
+          </tbody>
         </table>
       </div>
     )
