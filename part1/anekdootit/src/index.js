@@ -1,33 +1,80 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+const Anecdote = (props) => {
+  return (
+    <div>
+      {props.anecdote}<br />
+      has {props.votes} votes
+    </div>
+  )
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      selected: 0
+      selected: 0,
+      points: [0, 0, 0, 0, 0, 0]
     }
   }
 
-  pickRandomAnecdote = () => {
-    let selection = Math.floor(Math.random() * (anecdotes.length))
-
-    while (selection === this.state.selected){
-      selection = Math.floor(Math.random() * (anecdotes.length))
+  nextAnecdote = () => {
+    if (this.state.selected === anecdotes.length-1){
+      return () => {
+        this.setState({selected: 0})
+      }
     }
 
     return () => {
-      this.setState({selected: selection})
+      this.setState({selected: this.state.selected+1})
+    }
+  }
+
+  getPopularIndex = () => {
+    const index = this.state.points.indexOf(Math.max(...this.state.points))
+    return index
+  }
+
+  printPopularAnecdote = () => {
+    if (this.state.points.every(v => v === 0)){
+      return (
+        <div>
+          no votes have been given yet.
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          <Anecdote anecdote={this.props.anecdotes[this.getPopularIndex()]}
+                    votes={this.state.points[this.getPopularIndex()]}/>
+        </div>
+      )
+    }
+  }
+
+  voteAnecdote = () => {
+    const elements = [...this.state.points]
+    elements[this.state.selected] += 1
+
+    return () => {
+      this.setState({points: elements})
     }
   }
 
   render() {
     return (
       <div>
-        {this.props.anecdotes[this.state.selected]}<br />
-        <button onClick={this.pickRandomAnecdote()}>
-          Pick random anecdote
+        <Anecdote anecdote={this.props.anecdotes[this.state.selected]}
+                  votes={this.state.points[this.state.selected]}/>
+        <button onClick={this.voteAnecdote()}>
+          vote
         </button>
+        <button onClick={this.nextAnecdote()}>
+          next anecdote
+        </button>
+        <h2>anecdote with most votes:</h2>
+        {this.printPopularAnecdote()}
       </div>
     )
   }
