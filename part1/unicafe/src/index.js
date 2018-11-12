@@ -15,7 +15,10 @@ const Button = (props) => {
 
 const Statistic = (props) => {
   return (
-    <li>{props.name} {props.value}</li>
+    <tr>
+      <td>{props.name}</td>
+      <td>{props.value}</td>
+    </tr>
   )
 }
 
@@ -30,7 +33,7 @@ const Statistics = (props) => {
   } else {
     return (
       <div>
-        <ul>
+        <table>
           <Statistic name="hyvä"
             value={props.tila.hyva} />
           <Statistic name="neutraali"
@@ -41,7 +44,7 @@ const Statistics = (props) => {
             value={props.funktiot.laskeKeskiarvo().toFixed(1)} />
           <Statistic name="positiivisia"
             value={props.funktiot.laskePositiivistenOsuus().toFixed(1) + "%"} />
-        </ul>
+        </table>
       </div>
     )
   }
