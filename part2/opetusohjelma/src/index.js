@@ -13,11 +13,26 @@ const Osa = (props) => {
   )
 }
 
+const Yhteensa = (props) => {
+  const tehtavaMaarat = props.osat.map(osa => osa.tehtavia)
+
+  const getSum = (total, num) => {
+    return total + num
+  }
+
+  return (
+    <div>
+      yhteensä {tehtavaMaarat.reduce(getSum)} tehtävää
+    </div>
+  )
+}
+
 const Sisalto = (props) => {
   return (
     <div>
       {props.osat.map((osa, id) => <Osa key={osa.id}
         nimi={osa.nimi} tehtavia={osa.tehtavia}/>)}
+      <Yhteensa osat={props.osat} />
     </div>
   )
 }
@@ -34,6 +49,7 @@ const Kurssi = (props) => {
 const App = () => {
   const kurssi = {
     nimi: 'Half Stack -sovelluskehitys',
+    id: 1,
     osat: [
       {
         nimi: 'Reactin perusteet',
@@ -49,6 +65,11 @@ const App = () => {
         nimi: 'Komponenttien tila',
         tehtavia: 14,
         id: 3
+      },
+      {
+        nimi: 'Redux',
+        tehtavia: 7,
+        id: 4
       }
     ]
   }
