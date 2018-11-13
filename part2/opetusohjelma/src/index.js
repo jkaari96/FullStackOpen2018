@@ -16,7 +16,8 @@ const Osa = (props) => {
 const Sisalto = (props) => {
   return (
     <div>
-      {props.osat.map(osa => <Osa nimi={osa.nimi} tehtavia={osa.tehtavia}/>)}
+      {props.osat.map((osa, id) => <Osa key={osa.id}
+        nimi={osa.nimi} tehtavia={osa.tehtavia}/>)}
     </div>
   )
 }
