@@ -25,10 +25,16 @@ class App extends React.Component {
       name: this.state.newName
     }
 
-    const persons = this.state.persons.concat(nameObject)
+    let personsArray = []
+
+    if (this.state.persons.indexOf(nameObject.name) !== -1) {
+      personsArray = this.state.persons.concat(nameObject)
+    } else {
+      personsArray = this.state.persons
+    }
 
     this.setState({
-      persons: persons,
+      persons: personsArray,
       newName: ''
     })
   }
