@@ -2,9 +2,10 @@ import React from 'react';
 
 const Address = (props) => {
   return (
-    <div>
-      {props.name}
-    </div>
+    <tr>
+      <td>{props.name}</td>
+      <td>{props.number}</td>
+    </tr>
   )
 }
 
@@ -13,34 +14,43 @@ class App extends React.Component {
     super(props)
     this.state = {
       persons: [
-        { name: 'Arto Hellas' }
+        {
+          name: 'Arto Hellas',
+          number: '040-123456'
+        }
       ],
-      newName: ''
+      newName: '',
+      newNumber: ''
     }
   }
 
   addName = (event) => {
     event.preventDefault()
-    const nameObject = {
-      name: this.state.newName
+    let personsArray = []
+    const personObject = {
+      name: this.state.newName,
+      number: this.state.newNumber
     }
 
-    let personsArray = []
-
-    if (this.state.persons.indexOf(nameObject.name) !== -1) {
-      personsArray = this.state.persons.concat(nameObject)
-    } else {
+    if (this.state.persons.find(person => person.name === this.state.newName)){
       personsArray = this.state.persons
+    } else {
+      personsArray = this.state.persons.concat(personObject)
     }
 
     this.setState({
       persons: personsArray,
-      newName: ''
+      newName: '',
+      newNumber: ''
     })
   }
 
   handleNameChange = (event) => {
     this.setState({ newName: event.target.value })
+  }
+
+  handleNumberChange = (event) => {
+    this.setState({ newNumber: event.target.value })
   }
 
   render() {
@@ -53,12 +63,20 @@ class App extends React.Component {
                           onChange={this.handleNameChange} />
           </div>
           <div>
+            numero: <input value={this.state.newNumber}
+                            onChange={this.handleNumberChange} />
+          </div>
+          <div>
             <button type="submit">lisää</button>
           </div>
         </form>
         <h2>Numerot</h2>
-        {this.state.persons.map(person => <Address key={person.name}
-          name={person.name} />)}
+        <table>
+          <tbody>
+          {this.state.persons.map(person => <Address key={person.name}
+            name={person.name} number={person.number} />)}
+          </tbody>
+        </table>
       </div>
     )
   }
