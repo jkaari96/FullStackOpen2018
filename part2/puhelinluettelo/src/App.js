@@ -1,4 +1,5 @@
-import React from 'react';
+import React from 'react'
+import axios from 'axios'
 
 class AddNewForm extends React.Component {
   constructor(props) {
@@ -87,12 +88,7 @@ class App extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      persons: [
-        { name: 'Arto Hellas', number: '040-123456' },
-        { name: 'Martti Tienari', number: '040-123456' },
-        { name: 'Arto Järvinen', number: '040-123456' },
-        { name: 'Lea Kutvonen', number: '040-123456' }
-      ],
+      persons: [],
       filter: ''
     }
 
@@ -105,6 +101,15 @@ class App extends React.Component {
 
   handlePersonsChange = (value) => {
     this.setState({persons: value})
+  }
+
+  componentDidMount() {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        const persons = response.data
+        this.setState({ persons: persons })
+      })
   }
 
   render() {
