@@ -103,7 +103,7 @@ class App extends React.Component {
     this.setState({ filter: event.target.value })
   }
 
-  handlePersonsChange(value) {
+  handlePersonsChange = (value) => {
     this.setState({persons: value})
   }
 
