@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+import personService from './services/persons'
 
 class AddNewForm extends React.Component {
   constructor(props) {
@@ -17,21 +17,22 @@ class AddNewForm extends React.Component {
   addName = (event) => {
     event.preventDefault()
     let personsArray = []
+    personsArray = this.props.state.persons
     const personObject = {
       name: this.state.newName,
       number: this.state.newNumber
     }
 
-    if (this.props.state.persons.find(person =>
+    if (!this.props.state.persons.find(person =>
       person.name === this.state.newName)){
-      personsArray = this.props.state.persons
-    } else {
-      personsArray = this.props.state.persons.concat(personObject)
-      axios.post('http://localhost:3001/persons', personObject)
+        personService
+          .create(personObject)
+          .then(response => {
+            personsArray = this.props.state.persons.concat(response.data)
+            this.props.formFunction(personsArray)
+            this.setState({newName: '', newNumber: ''})
+      })
     }
-
-    this.props.formFunction(personsArray)
-    this.setState({newName: '', newNumber: ''})
   }
 
   handleNameChange = (event) => {
@@ -67,18 +68,41 @@ const Address = (props) => {
     <tr>
       <td>{props.name}</td>
       <td>{props.number}</td>
+      <td>
+        <button onClick={props.removeFunction}>
+          poista
+        </button>
+      </td>
     </tr>
   )
 }
 
 const AddressList = (props) => {
+  const removeFunc = (id, name) => {
+    return () => {
+      const result = window.confirm(`poistetaanko ${name}`)
+      if (result){
+        personService
+          .deleteEntry(id)
+          .then(response => {
+            personService
+              .getAll()
+              .then(response => {
+                props.update(response.data)
+            })
+        })
+      }
+    }
+  }
+
   return (
     <div>
       <h2>Numerot</h2>
       <table>
         <tbody>
         {props.addresses.map(person => <Address key={person.name}
-          name={person.name} number={person.number} />)}
+          name={person.name} number={person.number}
+          removeFunction={removeFunc(person.id, person.name)}/>)}
         </tbody>
       </table>
     </div>
@@ -105,8 +129,8 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    axios
-      .get('http://localhost:3001/persons')
+    personService
+      .getAll()
       .then(response => {
         const persons = response.data
         this.setState({ persons: persons })
@@ -125,7 +149,8 @@ class App extends React.Component {
                                     onChange={this.handleFilterChange} />
         </div>
         <AddNewForm state={this.state} formFunction={this.handlePersonsChange}/>
-        <AddressList addresses={addressesToShow}/>
+        <AddressList addresses={addressesToShow} state={this.state}
+          update={this.handlePersonsChange}/>
       </div>
     )
   }
