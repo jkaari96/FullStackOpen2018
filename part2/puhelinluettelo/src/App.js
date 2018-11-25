@@ -27,6 +27,7 @@ class AddNewForm extends React.Component {
       personsArray = this.props.state.persons
     } else {
       personsArray = this.props.state.persons.concat(personObject)
+      axios.post('http://localhost:3001/persons', personObject)
     }
 
     this.props.formFunction(personsArray)
