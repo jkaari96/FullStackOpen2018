@@ -24,7 +24,7 @@ class AddNewForm extends React.Component {
     }
 
     if (!this.props.state.persons.find(person =>
-      person.name === this.state.newName)){
+      person.name.toLowerCase() === this.state.newName.toLowerCase())){
         personService
           .create(personObject)
           .then(response => {
@@ -32,6 +32,25 @@ class AddNewForm extends React.Component {
             this.props.formFunction(personsArray)
             this.setState({newName: '', newNumber: ''})
       })
+    } else {
+      const result = window.confirm(`${this.state.newName} on jo luettelossa,
+        korvataanko vanha numero uudella?`)
+
+      if (result) {
+        const address = this.props.state.persons.find(person =>
+          person.name.toLowerCase() === this.state.newName.toLowerCase())
+        console.log(address)
+        const changedAddress = {...address, number: this.state.newNumber}
+
+        personService
+          .update(address.id, changedAddress)
+          .then(response => {
+            const changedArray = this.props.state.persons.map(person =>
+              person.id !== address.id ? person : response.data)
+            this.props.formFunction(changedArray)
+            this.setState({newName: '', newNumber: ''})
+          })
+      }
     }
   }
 
@@ -139,7 +158,7 @@ class App extends React.Component {
 
   render() {
     const addressesToShow = this.state.persons.filter(person =>
-          person.name.toLowerCase().startsWith(this.state.filter.toLowerCase()))
+          person.name.toLowerCase().includes(this.state.filter.toLowerCase()))
 
     return (
       <div>
