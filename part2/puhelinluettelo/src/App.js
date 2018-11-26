@@ -1,12 +1,32 @@
 import React from 'react'
 import personService from './services/persons'
 
+const Notification = ({message, error}) => {
+  if (message === null){
+    return null;
+  }
+
+  if (error){
+    return (
+      <div className="error">
+        {message}
+      </div>
+    )
+  }
+
+  return (
+    <div className="notification">
+      {message}
+    </div>
+  )
+}
+
 class AddNewForm extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       newName: '',
-      newNumber: ''
+      newNumber: '',
     }
 
     this.handleNameChange = this.handleNameChange.bind(this)
@@ -29,8 +49,14 @@ class AddNewForm extends React.Component {
           .create(personObject)
           .then(response => {
             personsArray = this.props.state.persons.concat(response.data)
-            this.props.formFunction(personsArray)
+            const message = `lisättiin ${personObject.name}`
+            this.props.formFunction(personsArray, message)
             this.setState({newName: '', newNumber: ''})
+          })
+          .catch(error => {
+            const message = `osoitteen ${personObject.name} luomisessa
+            tapahtui virhe`
+            this.props.errorFunc(message)
       })
     } else {
       const result = window.confirm(`${this.state.newName} on jo luettelossa,
@@ -39,7 +65,6 @@ class AddNewForm extends React.Component {
       if (result) {
         const address = this.props.state.persons.find(person =>
           person.name.toLowerCase() === this.state.newName.toLowerCase())
-        console.log(address)
         const changedAddress = {...address, number: this.state.newNumber}
 
         personService
@@ -47,8 +72,28 @@ class AddNewForm extends React.Component {
           .then(response => {
             const changedArray = this.props.state.persons.map(person =>
               person.id !== address.id ? person : response.data)
-            this.props.formFunction(changedArray)
+            const message = `muokattiin ${changedAddress.name}`
+            this.props.formFunction(changedArray, message)
             this.setState({newName: '', newNumber: ''})
+          })
+          .catch(error => {
+            const message = `osoitetta ${changedAddress.name} ei löytynyt
+                              palvelimelta, luodaan uusi`
+            personService
+              .create(changedAddress)
+              .then(response => {
+                personsArray = this.props.state.persons.filter((person) =>
+                person.name.toLowerCase() !== changedAddress.name.toLowerCase())
+
+                personsArray = personsArray.concat(response.data)
+                this.props.formFunction(personsArray, message)
+                this.setState({newName: '', newNumber: ''})
+              })
+              .catch(error => {
+                const message = `osoitteen ${personObject.name} luomisessa
+                tapahtui virhe`
+                this.props.errorFunc(message)
+              })
           })
       }
     }
@@ -65,7 +110,7 @@ class AddNewForm extends React.Component {
   render () {
     return (
       <form onSubmit={this.addName}>
-        <h2>Lisää uusi</h2>
+        <h2>Lisää uusi / muuta olemassaolevan numeroa</h2>
         <div>
           nimi: <input value={this.state.newName}
                         onChange={this.handleNameChange} />
@@ -107,8 +152,17 @@ const AddressList = (props) => {
             personService
               .getAll()
               .then(response => {
-                props.update(response.data)
+                const message = `poistettiin ${name}`
+                props.update(response.data, message)
             })
+            .catch(error => {
+              const message = `palvelimeen ei saada yhteyttä`
+              props.errorFunc(message)
+            })
+        })
+        .catch(error => {
+          const message = `osoitetta ${name} ei löytynyt palvelimelta`
+          props.errorFunc(message)
         })
       }
     }
@@ -133,7 +187,9 @@ class App extends React.Component {
     super(props)
     this.state = {
       persons: [],
-      filter: ''
+      filter: '',
+      notification: null,
+      error: false
     }
 
     this.handlePersonsChange = this.handlePersonsChange.bind(this)
@@ -143,8 +199,25 @@ class App extends React.Component {
     this.setState({ filter: event.target.value })
   }
 
-  handlePersonsChange = (value) => {
-    this.setState({persons: value})
+  handlePersonsChange = (value, message) => {
+    this.setState({persons: value, notification: message})
+    setTimeout(() => {
+      this.setState({notification: null})
+    }, 5000)
+  }
+
+  handlePersonRemoval = (value, message) => {
+    this.setState({persons: value, notification: message})
+    setTimeout(() => {
+      this.setState({notification: null})
+    }, 5000)
+  }
+
+  displayError = (message) => {
+    this.setState({notification: message, error: true})
+    setTimeout(() => {
+      this.setState({notification: null, error: false})
+    }, 5000)
   }
 
   componentDidMount() {
@@ -162,14 +235,19 @@ class App extends React.Component {
 
     return (
       <div>
-        <h2>Puhelinluettelo</h2>
+        <div>
+          <h2>Puhelinluettelo</h2>
+          <Notification message={this.state.notification}
+                        error={this.state.error}/>
+        </div>
         <div>
           rajaa näytettäviä: <input value={this.state.filter}
                                     onChange={this.handleFilterChange} />
         </div>
-        <AddNewForm state={this.state} formFunction={this.handlePersonsChange}/>
+        <AddNewForm state={this.state} formFunction={this.handlePersonsChange}
+                    errorFunc={this.displayError}/>
         <AddressList addresses={addressesToShow} state={this.state}
-          update={this.handlePersonsChange}/>
+          update={this.handlePersonRemoval} errorFunc={this.displayError}/>
       </div>
     )
   }

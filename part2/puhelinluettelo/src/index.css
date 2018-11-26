@@ -8,6 +8,20 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.notification {
+  background-color: green;
+  color: white;
+  padding: 15px;
+  font-size: 20px;
+}
+
+.error {
+  background-color: red;
+  color: white;
+  padding: 15px;
+  font-size: 20px;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
